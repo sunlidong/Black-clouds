@@ -1,0 +1,15 @@
+OrdererOrgs:
+- Name: Orderer
+  Domain: sanji.com
+  Specs:
+  - Hostname: orderer
+
+PeerOrgs:
+- Name: Osj
+  Domain: osj.sanji.com
+  Template:
+    Count: 3
+  Users:
+    Count: 1
+
+

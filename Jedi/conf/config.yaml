@@ -1,0 +1,134 @@
+name: "sanji-service-network"
+
+version: 1.1.0
+
+client:
+  organization: Osj
+  logging:
+    level: info
+  cryptoconfig:
+    path: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config
+  credentialStore:
+    path: /tmp/suyuan-service-store
+
+
+  BCCSP:
+    security:
+      enabled: true
+      default:
+        provider: "SW"
+      hashAlgorithm: "SHA2"
+      softVerify: true
+      level: 256
+
+  tlsCerts:
+    systemCertPool: true
+    client:
+      keyfile: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/peerOrganizations/osj.sanji.com/users/User1@osj.sanji.com/tls/client.key
+      certfile: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/peerOrganizations/osj.sanji.com/users/User1@osj.sanji.com/tls/client.crt
+
+      
+
+channels:
+  sjchannel:
+    orderers:
+      - orderer.sanji.com
+
+    peers:
+      peer0.osj.sanji.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.osj.sanji.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer2.osj.sanji.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+    policies:
+      queryChannelConfig:
+        minResponses: 1
+        maxTargets: 1
+        retryOpts:
+          attempts: 5
+          initialBackoff: 500ms
+          maxBackoff: 5s
+          backoffFactor: 2.0
+
+
+organizations:
+  osj:
+    # configtx.yaml organizations -> ID
+    mspid: osj.sanji.com
+
+    cryptoPath: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/peerOrganizations/osj.sanji.com/users/{username}@osj.sanji.com/msp
+    peers:
+    - peer0.osj.sanji.com
+    - peer1.osj.sanji.com
+    - peer2.osj.sanji.com
+  ordererorg:
+    mspID: sanji.com
+    cryptoPath: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/ordererOrganizations/sanji.com/users/Admin@sanji.com/msp
+
+orderers:
+  orderer.sanji.com:
+    url: localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.sanji.com
+      keep-alive-time: 0s
+      keep-alive-timeout: 20s
+      keep-alive-permit: false
+      fail-fast: false
+      allow-insecure: false
+
+    tlsCACerts:
+      path: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/ordererOrganizations/sanji.com/tlsca/tlsca.sanji.com-cert.pem
+
+peers:
+  peer0.osj.sanji.com:
+    url: grpcs://localhost:7051
+    eventUrl: localhost:7053
+    grpcOptions:
+      ssl-target-name-override: peer0.osj.sanji.com
+      keep-alive-time: 0s
+      keep-alive-timeout: 20s
+      keep-alive-permit: false
+      fail-fast: false
+      allow-insecure: false
+    tlsCACerts:
+      path: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/peerOrganizations/osj.sanji.com/tlsca/tlsca.osj.sanji.com-cert.pem
+
+  peer1.osj.sanji.com:
+    url: grpcs://localhost:8051
+    eventUrl: localhost:8053
+    grpcOptions:
+      ssl-target-name-override: peer1.osj.sanji.com
+      keep-alive-time: 0s
+      keep-alive-timeout: 20s
+      keep-alive-permit: false
+      fail-fast: false
+      allow-insecure: false
+    tlsCACerts:
+      path: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/peerOrganizations/osj.sanji.com/tlsca/tlsca.osj.sanji.com-cert.pem
+
+  peer2.osj.sanji.com:
+    url: grpcs://localhost:9051
+    eventUrl: localhost:9053
+    grpcOptions:
+      ssl-target-name-override: peer2.osj.sanji.com
+      keep-alive-time: 0s
+      keep-alive-timeout: 20s
+      keep-alive-permit: false
+      fail-fast: false
+      allow-insecure: false
+    tlsCACerts:
+      path: /home/boss/go-workspace/src/project_wm/Jedi/conf/crypto-config/peerOrganizations/osj.sanji.com/tlsca/tlsca.osj.sanji.com-cert.pem
+

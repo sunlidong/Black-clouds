@@ -1,0 +1,147 @@
+version: '2'
+
+networks:
+  SJ_net:
+
+services:
+  orderer.sanji.com:
+    image: hyperledger/fabric-orderer:latest
+    container_name: orderer.sanji.com
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_GENESISPROFILE=Orderer
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=sanji.com
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/sanji.com/orderers/orderer.sanji.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/sanji.com/orderers/orderer.sanji.com/tls:/var/hyperledger/orderer/tls
+    ports:
+      - 7050:7050
+    networks:
+      - SJ_net
+
+  peer0.osj.sanji.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer0.osj.sanji.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_ATTACHSTDOUT=true
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+      - CORE_PEER_ID=peer0.osj.sanji.com
+      - CORE_PEER_ADDRESSAUTODETECT=true
+      - CORE_PEER_ADDRESS=peer0.osj.sanji.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.osj.sanji.com:7051
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_LOCALMSPID=osj.sanji.com
+      - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+      - CORE_PEER_TLS_SERVERHOSTOVERRIDE=peer0.osj.sanji.com
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/osj.sanji.com/peers/peer0.osj.sanji.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/osj.sanji.com/peers/peer0.osj.sanji.com/tls:/var/hyperledger/tls
+    ports:
+      - 7051:7051
+      - 7053:7053
+    depends_on:
+      - orderer.sanji.com
+    links:
+      - orderer.sanji.com
+    networks:
+      - SJ_net
+
+  peer1.osj.sanji.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer1.osj.sanji.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_ATTACHSTDOUT=true
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+      - CORE_PEER_ID=peer1.osj.sanji.com
+      - CORE_PEER_ADDRESSAUTODETECT=true
+      - CORE_PEER_ADDRESS=peer1.osj.sanji.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.osj.sanji.com:7051
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_LOCALMSPID=osj.sanji.com
+      - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+      - CORE_PEER_TLS_SERVERHOSTOVERRIDE=peer1.osj.sanji.com
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/osj.sanji.com/peers/peer1.osj.sanji.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/osj.sanji.com/peers/peer1.osj.sanji.com/tls:/var/hyperledger/tls
+    ports:
+      - 8051:7051
+      - 8053:7053
+    depends_on:
+      - orderer.sanji.com
+    links:
+      - orderer.sanji.com
+    networks:
+      - SJ_net
+
+  peer2.osj.sanji.com:
+    image: hyperledger/fabric-peer:latest
+    container_name: peer2.osj.sanji.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_ATTACHSTDOUT=true
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+      - CORE_PEER_ID=peer2.osj.sanji.com
+      - CORE_PEER_ADDRESSAUTODETECT=true
+      - CORE_PEER_ADDRESS=peer2.osj.sanji.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.osj.sanji.com:7051
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_LOCALMSPID=osj.sanji.com
+      - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+      - CORE_PEER_TLS_SERVERHOSTOVERRIDE=peer2.osj.sanji.com
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./crypto-config/peerOrganizations/osj.sanji.com/peers/peer2.osj.sanji.com/msp:/var/hyperledger/msp
+      - ./crypto-config/peerOrganizations/osj.sanji.com/peers/peer2.osj.sanji.com/tls:/var/hyperledger/tls
+    ports:
+      - 9051:7051
+      - 9053:7053
+    depends_on:
+      - orderer.sanji.com
+    links:
+      - orderer.sanji.com
+    networks:
+      - SJ_net

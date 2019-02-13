@@ -1,0 +1,70 @@
+
+Organizations:				
+  - &Orderer				
+    Name: Orderer			
+    ID: sanji.com	# 该字段在设置背书测策略时需要使用
+    MSPDir: crypto-config/ordererOrganizations/sanji.com/msp
+
+  - &Osj
+    Name: OsjMSP
+    ID: osj.sanji.com
+    MSPDir: crypto-config/peerOrganizations/osj.sanji.com/msp
+    AnchorPeers:			
+      - Host: peer0.osj.sanji.com
+        Port: 7051
+
+Orderer: &OrdererDefaults
+
+  OrdererType: solo	  
+  Addresses:         
+    - orderer.sanji.com:7050
+  BatchTimeout: 5s    
+  BatchSize:
+    MaxMessageCount: 10		
+    AbsoluteMaxBytes: 98 MB 
+    PreferredMaxBytes: 512 KB
+  
+  Kafka:			 
+    Brokers:
+      - 127.0.0.1:9092   	
+  MaxChannels: 0
+  Organizations:
+
+
+Application: &ApplicationDefaults
+  Organizations:
+ 
+
+Capabilities:
+    Global: &ChannelCapabilities
+        V1_1: true
+    Orderer: &OrdererCapabilities
+        V1_1: true
+    Application: &ApplicationCapabilities
+        V1_1: true
+
+Profiles:
+  ThreeOrgsOrdererGenesis:
+    Capabilities:
+      <<: *ChannelCapabilities
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *Orderer
+      Capabilities:
+        <<: *OrdererCapabilities
+
+    Consortiums:
+      OsjConsortium:
+        Organizations:
+          - *Osj
+
+  sjOrgchannel:
+    Consortium: OsjConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Osj
+      Capabilities:
+        <<: *ApplicationCapabilities
+
